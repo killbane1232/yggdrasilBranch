@@ -14,11 +14,12 @@ import java.lang.reflect.Type
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
-
 @Service
 class TrunkConnection {
     @Autowired
     lateinit var leafCollector: LeafCollector
+    
+    private val config = TrunkConfig()
 
     @Scheduled(fixedRate = 1000)
     fun restoreConnection() {
@@ -32,7 +33,7 @@ class TrunkConnection {
             val websocketheaders = WebSocketHttpHeaders()
             val headers = StompHeaders()
 
-            val res = stompClient.connectAsync("ws://127.0.0.1:8080/ws", websocketheaders, headers,  sessionHandler)
+            val res = stompClient.connectAsync(config.getWebSocketUrl(), websocketheaders, headers, sessionHandler)
             res.whenComplete { x, y ->
                 if (x != null) {
                     WSClient = x
