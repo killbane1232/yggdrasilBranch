@@ -69,21 +69,6 @@ class LeafCollector {
     }
 
     @Scheduled(fixedRate = 5000)
-    fun collectLeaves() {
-        val resHolder = HashMap<String, String>()
-        var confServices: ArrayList<Leaf>
-        synchronized(lock) {
-            confServices = ArrayList(configuredServices)
-        }
-        for (service in confServices) {
-            resHolder[service.name] = getServiceStatus(service.name)
-        }
-        synchronized(lock) {
-            leafStatus = resHolder
-        }
-    }
-
-    @Scheduled(fixedRate = 5000)
     fun reportLeaves() {
         var confServices: ArrayList<Leaf>
         synchronized(lock) {
@@ -93,10 +78,6 @@ class LeafCollector {
         val currentInfo = BranchInfo(serviceName, confServices)
 
         TrunkConnection.WSClient?.send("/app/assing", currentInfo)
-    }
-
-    fun getServiceStatus(serviceName: String) : String {
-        return configuredServices.find({x -> x.name == serviceName})?.controller?.status()?:""
     }
 
     fun callServiceMethod(serviceName: String, method: String, args: List<String>) : String {
