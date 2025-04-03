@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
     id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.6'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.24'
+//    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.24'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.21'
 }
 
@@ -27,7 +27,13 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation('org.springframework.boot:spring-boot-starter-websocket') {
+        exclude group: "org.springframework.boot", module : "spring-boot-starter-tomcat"
+    }
+    implementation("org.springframework.boot:spring-boot-starter-web") {
+        exclude group: "org.springframework.boot", module : "spring-boot-starter-tomcat"
+    }
+    implementation("org.springframework.boot:spring-boot-starter-jetty")
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation('org.jetbrains.kotlinx:kotlinx-serialization-json')
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.18.+"

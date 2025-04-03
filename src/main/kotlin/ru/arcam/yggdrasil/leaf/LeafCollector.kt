@@ -24,10 +24,7 @@ class LeafCollector {
     @Scheduled(fixedRate = 5000)
     fun updateConfiguredServices() {
         try {
-            // Получаем путь к директории, где находится JAR файл
-            val jarPath = LeafCollector::class.java.protectionDomain.codeSource.location.toURI().path
-            val jarDir = File(jarPath).parentFile
-            var configFile = File(jarDir, "leaves.config")
+            var configFile = File("leaves.config")
             var leafServices: List<String> = ArrayList()
             var confServicesBuffer = ArrayList<Leaf>()
             val newServices = ArrayList<Leaf>()
@@ -47,7 +44,7 @@ class LeafCollector {
                 newLeaf.controller = if (isWindows) WindowsController(newLeaf) else LinuxController(newLeaf)
                 confServicesBuffer.add(newLeaf)
             }
-            configFile = File(jarDir, "docker.config")
+            configFile = File("docker.config")
             leafServices = ArrayList()
 
             if (configFile.exists()) {
