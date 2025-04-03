@@ -15,9 +15,7 @@ class TrunkConfig {
 
     private fun loadConfig() {
         try {
-            val jarPath = TrunkConfig::class.java.protectionDomain.codeSource.location.toURI().path
-            val jarDir = File(jarPath).parentFile
-            val configFile = File(jarDir, "websocket.config")
+            val configFile = File("websocket.config")
 
             if (configFile.exists()) {
                 configFile.readLines().forEach { line ->

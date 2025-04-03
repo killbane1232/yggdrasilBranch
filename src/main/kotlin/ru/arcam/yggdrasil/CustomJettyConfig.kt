@@ -13,10 +13,10 @@ class CustomJettyConfig : WebServerFactoryCustomizer<JettyServletWebServerFactor
     val logger: Logger = LoggerFactory.getLogger(CustomJettyConfig::class.java)
     override fun customize(factory: JettyServletWebServerFactory) {
         logger.info("Configuring Tomcat...");
-        factory.port = 8080
+        factory.port = 8081
     }
     @Bean
     fun jettyFactory(): JettyServletWebServerFactory {
-        return JettyServletWebServerFactory(8080)
+        return JettyServletWebServerFactory(8081)
     }
 }
