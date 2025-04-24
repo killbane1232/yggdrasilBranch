@@ -17,7 +17,7 @@ class TrunkConfig {
         try {
             // Пытаемся найти конфигурационный файл в разных местах
             val configdir = File(".").listFiles()!!.firstOrNull{ it.isDirectory && it.name == "config" }
-            if (configdir?.listFiles() == null) {
+            if (configdir == null || configdir.listFiles() == null) {
                 println("not found config dir")
                 return
             }
