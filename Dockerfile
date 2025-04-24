@@ -84,7 +84,7 @@ COPY . .
 
 # Сборка приложения
 RUN chmod +x ./gradlew && ./gradlew bootJar
-RUN mv build/libs/yggdrasilBranch-0.0.1-SNAPSHOT.jar /app/yggdrasilBranch.jar
+RUN mv ./build/libs/yggdrasilBranch-0.0.1-SNAPSHOT.jar /app/yggdrasilBranch.jar
 
 # Создание директории для конфигурационных файлов
 RUN mkdir -p /app
