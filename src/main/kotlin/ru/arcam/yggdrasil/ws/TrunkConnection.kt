@@ -10,6 +10,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
 import ru.arcam.yggdrasil.leaf.Leaf
 import ru.arcam.yggdrasil.leaf.LeafCollector
+import ru.arcam.yggdrasil.utils.NameResolver
 import java.lang.reflect.Type
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
@@ -51,7 +52,7 @@ class TrunkConnection {
     }
 
     class MyStompSessionHandler(val leafCollector: LeafCollector) : StompSessionHandlerAdapter() {
-        val serviceName: String = java.net.InetAddress.getLocalHost().hostName
+        val serviceName: String = NameResolver.name
         @OptIn(ExperimentalStdlibApi::class)
         override fun getPayloadType(headers: StompHeaders): Type {
             return typeOf<String>().javaType

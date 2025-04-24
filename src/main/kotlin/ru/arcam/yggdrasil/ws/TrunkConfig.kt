@@ -1,5 +1,6 @@
 package ru.arcam.yggdrasil.ws
 
+import ru.arcam.yggdrasil.utils.ConfigReader
 import java.io.File
 import java.net.URI
 
@@ -14,39 +15,21 @@ class TrunkConfig {
     }
 
     fun loadConfig() {
-        try {
-            // Пытаемся найти конфигурационный файл в разных местах
-            val configdir = File(".").listFiles()!!.firstOrNull{ it.isDirectory && it.name == "config" }
-            if (configdir == null || configdir.listFiles() == null) {
-                println("not found config dir")
-                return
-            }
-
-            val configFile = configdir.listFiles()!!.firstOrNull{it.name == "websocket.config"}
-
-            if (configFile != null) {
-                println("found config: " + configFile.absolutePath)
-                configFile.readLines().forEach { line ->
-                    if (line.isNotBlank() && !line.startsWith("#")) {
-                        val parts = line.split("=")
-                        if (parts.size == 2) {
-                            when (parts[0].trim()) {
-                                "websocket.host" -> host = parts[1].trim()
-                                "websocket.port" -> port = parts[1].trim().toInt()
-                                "websocket.path" -> path = parts[1].trim()
-                                "websocket.timeout" -> timeout = parts[1].trim().toLong()
-                            }
-                        }
+        val configFile = ConfigReader.loadConfig("websocket.config")
+        configFile?.readLines()?.forEach { line ->
+            if (line.isNotBlank() && !line.startsWith("#")) {
+                val parts = line.split("=")
+                if (parts.size == 2) {
+                    when (parts[0].trim()) {
+                        "websocket.host" -> host = parts[1].trim()
+                        "websocket.port" -> port = parts[1].trim().toInt()
+                        "websocket.path" -> path = parts[1].trim()
+                        "websocket.timeout" -> timeout = parts[1].trim().toLong()
                     }
                 }
-                println("config after reading: " + getWebSocketUrl())
-            } else {
-                println("not found config")
-                println(configdir.listFiles().joinToString { "\n " + it.name + ": " + it.absolutePath })
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+        println("config after reading: " + getWebSocketUrl())
     }
 
     fun getWebSocketUrl(): String = "ws://$host:$port$path"

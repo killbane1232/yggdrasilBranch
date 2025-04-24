@@ -5,6 +5,8 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import ru.arcam.yggdrasil.branch.BranchInfo
 import ru.arcam.yggdrasil.service.*
+import ru.arcam.yggdrasil.utils.ConfigReader
+import ru.arcam.yggdrasil.utils.NameResolver
 import ru.arcam.yggdrasil.ws.TrunkConnection
 import java.io.File
 import java.util.*
@@ -19,7 +21,7 @@ class LeafCollector {
     private var leafStatus: Map<String, String> = HashMap()
     var lock: Any = Any()
     var configuredServices: ArrayList<Leaf> = ArrayList()
-    val serviceName = java.net.InetAddress.getLocalHost().hostName
+    val serviceName = NameResolver.name
 
     private fun findConfigFile(filename: String): File? {
         val possiblePaths = listOf(
@@ -33,7 +35,7 @@ class LeafCollector {
     @Scheduled(fixedRate = 5000)
     fun updateConfiguredServices() {
         try {
-            var configFile = findConfigFile("leaves.config")
+            var configFile = ConfigReader.loadConfig("leaves.config")
             var leafServices: List<String> = ArrayList()
             var confServicesBuffer = ArrayList<Leaf>()
             val newServices = ArrayList<Leaf>()
