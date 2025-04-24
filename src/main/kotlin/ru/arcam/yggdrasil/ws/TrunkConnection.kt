@@ -29,7 +29,7 @@ class TrunkConnection {
 
             val sessionHandler: StompSessionHandler = MyStompSessionHandler(leafCollector)
             stompClient.start()
-            println("CONNECTING")
+            println("Connecting to ${config.getWebSocketUrl()}")
             val websocketheaders = WebSocketHttpHeaders()
             val headers = StompHeaders()
 
@@ -40,7 +40,7 @@ class TrunkConnection {
                 }
                 else
                     println(y)
-                println("CONNECTED " + (x != null))
+                println("Connected: " + (x != null))
             }
         }
     }
