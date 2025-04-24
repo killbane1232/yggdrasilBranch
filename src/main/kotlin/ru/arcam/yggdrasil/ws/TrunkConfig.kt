@@ -21,6 +21,11 @@ class TrunkConfig {
                 File("./config/websocket.config"), // Явно относительно текущей директории
                 File("/app/config/websocket.config"), // Абсолютный путь
             )
+            val config = File(".")
+            println("cur is dig: " + config.isDirectory)
+            println("cur path: " + config.absolutePath)
+            if (config.isDirectory)
+                println("cur" + config.listFiles().joinToString { "\n" + it.name + ": " + it.absolutePath })
 
             val configFile = possiblePaths.firstOrNull { it.exists() }
 
