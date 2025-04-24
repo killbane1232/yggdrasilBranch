@@ -13,13 +13,13 @@ class TrunkConfig {
         loadConfig()
     }
 
-    private fun loadConfig() {
+    fun loadConfig() {
         try {
             // Пытаемся найти конфигурационный файл в разных местах
             val possiblePaths = listOf(
                 File("config/websocket.config"),  // Относительно текущей директории
                 File("./config/websocket.config"), // Явно относительно текущей директории
-                File("/app/config/websocket.config"), // Абсолютный путь от текущей директории
+                File("/app/config/websocket.config"), // Абсолютный путь
             )
 
             val configFile = possiblePaths.firstOrNull { it.exists() }
