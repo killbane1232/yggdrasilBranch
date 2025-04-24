@@ -20,12 +20,9 @@ class TrunkConfig {
                 File("config/websocket.config"),  // Относительно текущей директории
                 File("./config/websocket.config"), // Явно относительно текущей директории
                 File("/app/config/websocket.config"), // Абсолютный путь от текущей директории
-                File(TrunkConfig::class.java.protectionDomain.codeSource.location.toURI().path).parentFile?.let { 
-                    File(it, "config/websocket.config") 
-                } // Относительно JAR-файла
             )
 
-            val configFile = possiblePaths.firstOrNull { it?.exists() == true }
+            val configFile = possiblePaths.firstOrNull { it.exists() }
 
             if (configFile != null) {
                 configFile.readLines().forEach { line ->

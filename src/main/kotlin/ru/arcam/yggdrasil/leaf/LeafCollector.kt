@@ -26,11 +26,8 @@ class LeafCollector {
             File("config/$filename"),  // Относительно текущей директории
             File("./config/$filename"), // Явно относительно текущей директории
             File("/app/config/$filename"), // Абсолютный путь от текущей директории
-            File(LeafCollector::class.java.protectionDomain.codeSource.location.toURI().path).parentFile?.let { 
-                File(it, "config/$filename") 
-            } // Относительно JAR-файла
         )
-        return possiblePaths.firstOrNull { it?.exists() == true }
+        return possiblePaths.firstOrNull { it.exists() }
     }
 
     @Scheduled(fixedRate = 5000)
