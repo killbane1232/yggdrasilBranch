@@ -8,10 +8,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     lsb-release \
+    docker \
     && rm -rf /var/lib/apt/lists/*
-
-# Установка Docker
-RUN apk add docker
 
 # Создание рабочей директории
 WORKDIR /app
