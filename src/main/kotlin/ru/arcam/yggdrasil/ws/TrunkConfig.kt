@@ -16,20 +16,16 @@ class TrunkConfig {
     fun loadConfig() {
         try {
             // Пытаемся найти конфигурационный файл в разных местах
-            val possiblePaths = listOf(
-                File("config/websocket.config"),  // Относительно текущей директории
-                File("./config/websocket.config"), // Явно относительно текущей директории
-                File("/app/config/websocket.config"), // Абсолютный путь
-            )
-            val config = File(".")
-            println("cur is dig: " + config.isDirectory)
-            println("cur path: " + config.absolutePath)
-            if (config.isDirectory)
-                println("cur" + config.listFiles().joinToString { "\n" + it.name + ": " + it.absolutePath })
+            val configdir = File(".").listFiles()!!.firstOrNull{ it.isDirectory && it.name == "config" }
+            if (configdir?.listFiles() == null) {
+                println("not found config dir")
+                return
+            }
 
-            val configFile = possiblePaths.firstOrNull { it.exists() }
+            val configFile = configdir.listFiles()!!.firstOrNull{it.name == "websocket.config"}
 
             if (configFile != null) {
+                println("found config: " + configFile.absolutePath)
                 configFile.readLines().forEach { line ->
                     if (line.isNotBlank() && !line.startsWith("#")) {
                         val parts = line.split("=")
@@ -43,6 +39,7 @@ class TrunkConfig {
                         }
                     }
                 }
+                println("config after reading: " + getWebSocketUrl())
             }
         } catch (e: Exception) {
             e.printStackTrace()
