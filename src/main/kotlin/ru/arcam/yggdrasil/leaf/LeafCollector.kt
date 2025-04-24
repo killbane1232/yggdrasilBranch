@@ -30,7 +30,7 @@ class LeafCollector {
                 File(it, "config/$filename") 
             } // Относительно JAR-файла
         )
-        return possiblePaths.firstOrNull { it.exists() }
+        return possiblePaths.firstOrNull { it?.exists() == true }
     }
 
     @Scheduled(fixedRate = 5000)

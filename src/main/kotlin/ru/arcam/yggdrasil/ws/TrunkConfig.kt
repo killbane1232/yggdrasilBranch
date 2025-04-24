@@ -25,7 +25,7 @@ class TrunkConfig {
                 } // Относительно JAR-файла
             )
 
-            val configFile = possiblePaths.firstOrNull { it.exists() }
+            val configFile = possiblePaths.firstOrNull { it?.exists() == true }
 
             if (configFile != null) {
                 configFile.readLines().forEach { line ->
