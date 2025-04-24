@@ -40,6 +40,9 @@ class TrunkConfig {
                     }
                 }
                 println("config after reading: " + getWebSocketUrl())
+            } else {
+                println("not found config")
+                println(configdir.listFiles().joinToString { "\n " + it.name + ": " + it.absolutePath })
             }
         } catch (e: Exception) {
             e.printStackTrace()
