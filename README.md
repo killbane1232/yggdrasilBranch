@@ -40,4 +40,4 @@ minecraft-server
 # sudo права не обязательны, если запуск идёт от пользователя, который без них может работать с systemctl
 # На Windows обязательны права админинстратора
 sudo java -jar ./yggdrasil.jar --server.port={порт, на котором будет работать YggdrasilBranch}
-``
+```
