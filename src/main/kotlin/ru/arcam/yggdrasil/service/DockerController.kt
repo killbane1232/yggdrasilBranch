@@ -47,7 +47,12 @@ class DockerController(leaf: Leaf) : IController(leaf) {
             process.waitFor()
             val input = process.inputStream
             val br = BufferedReader(InputStreamReader(input))
-            return if (br.readLine() != null)  "RUNNING" else "STOPPED"
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                if (line!!.contains("Up"))
+                    return "RUNNING"
+            }
+            return "STOPPED"
         } catch (e: Exception) {
             e.printStackTrace()
         }
