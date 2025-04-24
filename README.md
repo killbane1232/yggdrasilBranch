@@ -65,6 +65,8 @@ services:
     volumes:
       - ./config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      BRANCHNAME: "{your branch name}"
     ports:
       - "8081:8080"
 ```
