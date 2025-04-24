@@ -15,7 +15,7 @@ class TrunkConfig {
 
     private fun loadConfig() {
         try {
-            val configFile = File("websocket.config")
+            val configFile = File("config/websocket.config")
 
             if (configFile.exists()) {
                 configFile.readLines().forEach { line ->

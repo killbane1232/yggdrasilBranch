@@ -24,7 +24,7 @@ class LeafCollector {
     @Scheduled(fixedRate = 5000)
     fun updateConfiguredServices() {
         try {
-            var configFile = File("leaves.config")
+            var configFile = File("config/leaves.config")
             var leafServices: List<String> = ArrayList()
             var confServicesBuffer = ArrayList<Leaf>()
             val newServices = ArrayList<Leaf>()
@@ -44,7 +44,7 @@ class LeafCollector {
                 newLeaf.controller = if (isWindows) WindowsController(newLeaf) else LinuxController(newLeaf)
                 confServicesBuffer.add(newLeaf)
             }
-            configFile = File("docker.config")
+            configFile = File("config/docker.config")
             leafServices = ArrayList()
 
             if (configFile.exists()) {
