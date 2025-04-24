@@ -1,9 +1,14 @@
 Yggdrasil Branch - проект для быстрого подключения сервисов к сервису Yggdrasil
 
-Сборка:
+Локальная сборка:
 ```
 ./gradlew bootJar
 mv ./build/libs/yggdrasilBranch-0.0.1-SNAPSHOT.jar {где удобнее будет, чтобы jar файл лежал}
+```
+
+Docker сборка
+```
+sudo docker build -t yggdrasil_branch:v2 .
 ```
 
 Примеры обязательных файлов конфигурации
@@ -41,3 +46,26 @@ minecraft-server
 # На Windows обязательны права админинстратора
 sudo java -jar ./yggdrasil.jar --server.port={порт, на котором будет работать YggdrasilBranch}
 ```
+
+Пример Docker Compose
+```
+version: "3"
+
+networks:
+  yggdarsil:
+    external: false
+
+services:
+  server:
+    image: yggdrasil_branch:v1
+    container_name: yggdrasilBranch
+    restart: always
+    networks:
+      - yggdarsil
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8081:8080"
+```
+
