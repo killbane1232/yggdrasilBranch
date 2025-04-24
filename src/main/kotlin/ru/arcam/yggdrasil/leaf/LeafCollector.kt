@@ -21,10 +21,22 @@ class LeafCollector {
     var configuredServices: ArrayList<Leaf> = ArrayList()
     val serviceName = java.net.InetAddress.getLocalHost().hostName
 
+    private fun findConfigFile(filename: String): File? {
+        val possiblePaths = listOf(
+            File("config/$filename"),  // Относительно текущей директории
+            File("./config/$filename"), // Явно относительно текущей директории
+            File("/app/config/$filename"), // Абсолютный путь от текущей директории
+            File(LeafCollector::class.java.protectionDomain.codeSource.location.toURI().path).parentFile?.let { 
+                File(it, "config/$filename") 
+            } // Относительно JAR-файла
+        )
+        return possiblePaths.firstOrNull { it.exists() }
+    }
+
     @Scheduled(fixedRate = 5000)
     fun updateConfiguredServices() {
         try {
-            var configFile = File("./config/leaves.config")
+            var configFile = findConfigFile("leaves.config")
             var leafServices: List<String> = ArrayList()
             var confServicesBuffer = ArrayList<Leaf>()
             val newServices = ArrayList<Leaf>()
@@ -35,7 +47,7 @@ class LeafCollector {
                     .collect(Collectors.toList()))
             }
 
-            if (configFile.exists()) {
+            if (configFile != null) {
                 leafServices = configFile.readLines()
                     .filter { it.isNotBlank() && !it.startsWith("#") }
             }
@@ -44,10 +56,10 @@ class LeafCollector {
                 newLeaf.controller = if (isWindows) WindowsController(newLeaf) else LinuxController(newLeaf)
                 confServicesBuffer.add(newLeaf)
             }
-            configFile = File("./config/docker.config")
+            configFile = findConfigFile("docker.config")
             leafServices = ArrayList()
 
-            if (configFile.exists()) {
+            if (configFile != null) {
                 leafServices = configFile.readLines()
                     .filter { it.isNotBlank() && !it.startsWith("#") }
             }

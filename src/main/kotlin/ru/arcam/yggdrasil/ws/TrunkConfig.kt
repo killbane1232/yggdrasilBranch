@@ -15,9 +15,19 @@ class TrunkConfig {
 
     private fun loadConfig() {
         try {
-            val configFile = File("./config/websocket.config")
+            // Пытаемся найти конфигурационный файл в разных местах
+            val possiblePaths = listOf(
+                File("config/websocket.config"),  // Относительно текущей директории
+                File("./config/websocket.config"), // Явно относительно текущей директории
+                File("/app/config/websocket.config"), // Абсолютный путь от текущей директории
+                File(TrunkConfig::class.java.protectionDomain.codeSource.location.toURI().path).parentFile?.let { 
+                    File(it, "config/websocket.config") 
+                } // Относительно JAR-файла
+            )
 
-            if (configFile.exists()) {
+            val configFile = possiblePaths.firstOrNull { it.exists() }
+
+            if (configFile != null) {
                 configFile.readLines().forEach { line ->
                     if (line.isNotBlank() && !line.startsWith("#")) {
                         val parts = line.split("=")
