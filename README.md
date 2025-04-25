@@ -57,7 +57,7 @@ networks:
 
 services:
   server:
-    image: yggdrasil_branch:v1
+    image: ghcr.io/killbane1232/yggdrasil_branch:latest
     container_name: yggdrasilBranch
     restart: always
     networks:
