@@ -57,7 +57,7 @@ networks:
 
 services:
   server:
-    image: yggdrasil_branch:v1
+    image: ghcr.io/killbane1232/yggdrasil_branch:latest
     container_name: yggdrasilBranch
     restart: always
     networks:
@@ -65,6 +65,8 @@ services:
     volumes:
       - ./config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      BRANCHNAME: "{your branch name}"
     ports:
       - "8081:8080"
 ```
