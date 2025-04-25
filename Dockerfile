@@ -73,18 +73,22 @@ RUN set -eux; \
     echo "java --version"; java --version; \
     echo "Complete."
 
-CMD ["jshell"]
-
 RUN apk add docker
-# Создание рабочей директории
-WORKDIR /app
+# Создание директории для сборки
+WORKDIR /build
 
 # Копирование файлов проекта
 COPY . .
 
 # Сборка приложения
 RUN chmod +x ./gradlew && ./gradlew bootJar
+RUN mkdir /app
 RUN mv ./build/libs/yggdrasilBranch-0.0.1-SNAPSHOT.jar /app/yggdrasilBranch.jar
+
+# Создание директории для приложения
+WORKDIR /app
+# Очистка директории сборки
+RUN rm -rf /build
 
 # Создание директории для конфигурационных файлов
 RUN mkdir -p /app
