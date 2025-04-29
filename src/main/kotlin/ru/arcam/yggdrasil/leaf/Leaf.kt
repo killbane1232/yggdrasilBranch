@@ -8,7 +8,7 @@ import kotlinx.serialization.Contextual
 @Serializable
 data class Leaf(
     val name: String,
-    val status: String,
+    var status: String,
     val attachedBranch: String = "",
     val hooks: List<LeafHook>,
     @JsonIgnore

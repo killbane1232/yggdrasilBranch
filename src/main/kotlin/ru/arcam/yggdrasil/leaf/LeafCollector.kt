@@ -53,6 +53,7 @@ class LeafCollector {
             leafServices.forEach { x ->
                 val newLeaf = Leaf(x, "UNAVAIVABLE", serviceName, ArrayList(), null)
                 newLeaf.controller = if (isWindows) WindowsController(newLeaf) else LinuxController(newLeaf)
+                newLeaf.status = newLeaf.controller!!.status()
                 confServicesBuffer.add(newLeaf)
             }
             configFile = findConfigFile("docker.config")
@@ -65,6 +66,7 @@ class LeafCollector {
             leafServices.forEach { x ->
                 val newLeaf = Leaf(x, "UNAVAIVABLE", serviceName, ArrayList(), null)
                 newLeaf.controller = DockerController(newLeaf)
+                newLeaf.status = newLeaf.controller!!.status()
                 confServicesBuffer.add(newLeaf)
             }
 
@@ -90,11 +92,19 @@ class LeafCollector {
 
     fun callServiceMethod(serviceName: String, method: String, args: List<String>) : String {
         return when(method) {
-            "STATUS" -> configuredServices.find({x -> x.name == serviceName})?.controller?.status()?:"UNAVAIVABLE"
-            "START" -> configuredServices.find({x -> x.name == serviceName})?.controller?.start()?:"ERROR"
-            "STOP" -> configuredServices.find({x -> x.name == serviceName})?.controller?.stop()?:"ERROR"
-            "RESTART" -> configuredServices.find({x -> x.name == serviceName})?.controller?.restart()?:"ERROR"
-            else -> configuredServices.find({x -> x.name == serviceName})?.controller?.callMethod(method, args)?:"ERROR"
+            "STATUS" -> {
+                val leaf = configuredServices.find { x -> x.name == serviceName }
+                if (leaf != null) {
+                    leaf.status = leaf.controller?.status()?:"UNAVAIVABLE"
+                    leaf.status
+                } else {
+                    "UNAVAIVABLE"
+                }
+            }
+            "START" -> configuredServices.find { x -> x.name == serviceName }?.controller?.start()?:"ERROR"
+            "STOP" -> configuredServices.find { x -> x.name == serviceName }?.controller?.stop()?:"ERROR"
+            "RESTART" -> configuredServices.find { x -> x.name == serviceName }?.controller?.restart()?:"ERROR"
+            else -> configuredServices.find { x -> x.name == serviceName }?.controller?.callMethod(method, args)?:"ERROR"
         }
     }
 }
