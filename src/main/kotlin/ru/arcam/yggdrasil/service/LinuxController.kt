@@ -54,6 +54,27 @@ class LinuxController(leaf: Leaf) : IController(leaf) {
         return "UNAVAIVABLE"
     }
 
+    override fun logs(args: List<String>?): String {
+        var num = 10
+        if (args != null && args.size > 0) {
+            val tmp = args[0].toIntOrNull()
+            if (tmp != null && tmp > 0)
+                num = tmp
+        }
+        val SERVER_LOGS = arrayOf("sudo", "/usr/bin/journalctl", "--unit=${leaf.name}", "-n", num.toString(), "--no-pager")
+        try {
+            val process = ProcessBuilder(*SERVER_LOGS).redirectErrorStream(true).start()
+            process.waitFor()
+            val input = process.inputStream
+            val br = BufferedReader(InputStreamReader(input))
+            val result = br.readLines().joinToString { it -> "\n" + it }
+            return result
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return "UNAVAIVABLE"
+    }
+
     override fun callMethod(method: String, args: List<String>): String {
         return "OK"
     }

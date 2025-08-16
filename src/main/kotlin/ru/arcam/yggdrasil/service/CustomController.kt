@@ -32,6 +32,10 @@ class CustomController(leaf: Leaf, val leafCollector: LeafCollector) : IControll
         return status
     }
 
+    override fun logs(args: List<String>?): String {
+        return "UNAVAIVABLE"
+    }
+
     override fun callMethod(method: String, args: List<String>): String {
         try {
             return LeafController.leafController.callLeafMethod(leaf.name, method, args)

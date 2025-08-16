@@ -6,5 +6,6 @@ abstract class IController(val leaf: Leaf) {
     abstract fun start(): String
     abstract fun restart(): String
     abstract fun status(): String
+    abstract fun logs(args: List<String>? = null): String
     abstract fun callMethod(method: String, args: List<String>): String
 }

@@ -104,6 +104,8 @@ class LeafCollector {
             "START" -> configuredServices.find { x -> x.name == serviceName }?.controller?.start()?:"ERROR"
             "STOP" -> configuredServices.find { x -> x.name == serviceName }?.controller?.stop()?:"ERROR"
             "RESTART" -> configuredServices.find { x -> x.name == serviceName }?.controller?.restart()?:"ERROR"
+            "TAIL" -> configuredServices.find { x -> x.name == serviceName }?.controller?.logs()?:"ERROR"
+            "TAIL_N" -> configuredServices.find { x -> x.name == serviceName }?.controller?.logs(args)?:"ERROR"
             else -> configuredServices.find { x -> x.name == serviceName }?.controller?.callMethod(method, args)?:"ERROR"
         }
     }

@@ -61,9 +61,9 @@ class TrunkConnection {
         override fun handleFrame(headers: StompHeaders, payload: Any?) {
             println("Received message: $payload from ${headers.destination}")
             val payloadSplit = payload.toString().split(':')
-            val args = listOf<String>()
+            var args = listOf<String>()
             if (payloadSplit.size > 2)
-                payloadSplit.subList(2, payloadSplit.size - 1)
+                args = payloadSplit.subList(2, payloadSplit.size - 1)
             val result = leafCollector.callServiceMethod(payloadSplit[1], payloadSplit[0], args)
             WSClient!!.send("/app/callback/$serviceName", result);
         }
