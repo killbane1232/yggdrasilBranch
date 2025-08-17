@@ -19,7 +19,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: yggdrasil_branch
+  IMAGE_NAME: killbane1232/yggdrasil_branch
 
 
 jobs:
