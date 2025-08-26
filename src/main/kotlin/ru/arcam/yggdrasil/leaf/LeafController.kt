@@ -4,10 +4,12 @@ import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
+import ru.arcam.yggdrasil.utils.NameResolver
 import ru.arcam.yggdrasil.ws.RequestBuffer
 
 
@@ -26,8 +28,9 @@ class LeafController(private val messagingTemplate: SimpMessagingTemplate) {
 
     @MessageMapping("/connect")
     @SendTo("/topic/leaf-status")
-    fun handleLeafConnection(leaf: Leaf): Leaf {
+    fun handleLeafConnection(@Payload leaf: Leaf): Leaf {
         synchronized(leafCollector.lock) {
+            leaf.attachedBranch = NameResolver.name
             leafCollector.configuredServices.add(leaf)
         }
         return leaf

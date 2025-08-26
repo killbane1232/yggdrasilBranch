@@ -9,6 +9,7 @@ class ConfigReader {
             val configdir = File(".").listFiles()!!.firstOrNull{ it.isDirectory && it.name == "config" }
             if (configdir == null || configdir.listFiles() == null) {
                 println("not found config dir")
+                println(File(".").absolutePath)
                 return null
             }
 
