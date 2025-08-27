@@ -13,6 +13,7 @@ import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.reflect.typeOf
 
 
 @Service
@@ -20,6 +21,7 @@ class LeafCollector {
     val isWindows: Boolean = System.getProperty("os.name").lowercase(Locale.getDefault()).contains("win")
     private var leafStatus: Map<String, String> = HashMap()
     var lock: Any = Any()
+    var linkedServices: ArrayList<Leaf> = ArrayList()
     var configuredServices: ArrayList<Leaf> = ArrayList()
     val serviceName = NameResolver.name
 
@@ -82,7 +84,7 @@ class LeafCollector {
     fun reportLeaves() {
         var confServices: ArrayList<Leaf>
         synchronized(lock) {
-            confServices = ArrayList(configuredServices)
+            confServices = ArrayList(configuredServices.union(linkedServices))
         }
 
         val currentInfo = BranchInfo(serviceName, confServices)
@@ -91,9 +93,9 @@ class LeafCollector {
     }
 
     fun callServiceMethod(serviceName: String, method: String, args: List<String>) : String {
+        val leaf = configuredServices.union(linkedServices).find { x -> x.name == serviceName }
         return when(method) {
             "STATUS" -> {
-                val leaf = configuredServices.find { x -> x.name == serviceName }
                 if (leaf != null) {
                     leaf.status = leaf.controller?.status()?:"UNAVAIVABLE"
                     leaf.status
@@ -101,12 +103,12 @@ class LeafCollector {
                     "UNAVAIVABLE"
                 }
             }
-            "START" -> configuredServices.find { x -> x.name == serviceName }?.controller?.start()?:"ERROR"
-            "STOP" -> configuredServices.find { x -> x.name == serviceName }?.controller?.stop()?:"ERROR"
-            "RESTART" -> configuredServices.find { x -> x.name == serviceName }?.controller?.restart()?:"ERROR"
-            "TAIL" -> configuredServices.find { x -> x.name == serviceName }?.controller?.logs()?:"ERROR"
-            "TAIL_N" -> configuredServices.find { x -> x.name == serviceName }?.controller?.logs(args)?:"ERROR"
-            else -> configuredServices.find { x -> x.name == serviceName }?.controller?.callMethod(method, args)?:"ERROR"
+            "START" -> leaf?.controller?.start()?:"ERROR"
+            "STOP" -> leaf?.controller?.stop()?:"ERROR"
+            "RESTART" -> leaf?.controller?.restart()?:"ERROR"
+            "TAIL" -> leaf?.controller?.logs()?:"ERROR"
+            "TAIL_N" -> leaf?.controller?.logs(args)?:"ERROR"
+            else -> leaf?.controller?.callMethod(method, args)?:"ERROR"
         }
     }
 }

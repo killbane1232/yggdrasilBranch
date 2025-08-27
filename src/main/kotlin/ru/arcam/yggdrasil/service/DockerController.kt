@@ -66,7 +66,7 @@ class DockerController(leaf: Leaf) : IController(leaf) {
             if (tmp != null && tmp > 0)
                 num = tmp
         }
-        val SERVER_LOGS = arrayOf("docker", "logs", "--name", leaf.name, "-n", num.toString())
+        val SERVER_LOGS = arrayOf("docker", "logs", leaf.name, "-n", num.toString())
         try {
             val process = ProcessBuilder(*SERVER_LOGS).redirectErrorStream(true).start()
             process.waitFor()

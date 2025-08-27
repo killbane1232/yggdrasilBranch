@@ -1,8 +1,6 @@
 package ru.arcam.yggdrasil.ws
 
 import ru.arcam.yggdrasil.utils.ConfigReader
-import java.io.File
-import java.net.URI
 
 class TrunkConfig {
     private var host: String = "localhost"

@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
+import ru.arcam.yggdrasil.service.CustomController
 import ru.arcam.yggdrasil.utils.NameResolver
 import ru.arcam.yggdrasil.ws.RequestBuffer
 
@@ -29,9 +30,12 @@ class LeafController(private val messagingTemplate: SimpMessagingTemplate) {
     @MessageMapping("/connect")
     @SendTo("/topic/leaf-status")
     fun handleLeafConnection(@Payload leaf: Leaf): Leaf {
+        println("Connecting to /connect: ${leaf.name}")
         synchronized(leafCollector.lock) {
             leaf.attachedBranch = NameResolver.name
-            leafCollector.configuredServices.add(leaf)
+            leaf.controller = CustomController(leaf, leafCollector)
+            if (leafCollector.linkedServices.firstOrNull { x -> x.name == leaf.name } == null)
+                leafCollector.linkedServices.add(leaf)
         }
         return leaf
     }
@@ -50,7 +54,6 @@ class LeafController(private val messagingTemplate: SimpMessagingTemplate) {
         requestBuffer.cleanup()
     }
 
-    @MessageMapping("/leaf/{leaf}")
     @SendTo("/topic/leaf/{leaf}")
     fun callLeafMethod(@DestinationVariable leaf: String, method: String, args: List<String>): String {
         println("Sending message to /topic/leaf/$leaf: $method")
@@ -66,11 +69,6 @@ class LeafController(private val messagingTemplate: SimpMessagingTemplate) {
         messagingTemplate.convertAndSend("/topic/leaf/$leaf", LeafMethodMessage(method, args))
         return requestBuffer.addRequest(leaf, method).get()
     }
-
-    private data class LeafMethodMessage(
-        val method: String,
-        val args: List<String>
-    )
 
     companion object {
         lateinit var leafController: LeafController

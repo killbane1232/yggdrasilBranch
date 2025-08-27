@@ -24,5 +24,9 @@ data class Leaf(
     val hooks: List<LeafHook>,
     @JsonIgnore
     @Contextual
-    var controller: IController? = null
+    var controller: IController? = null,
+    @JsonIgnore
+    var port: Int = 0,
+    @JsonIgnore
+    var url: String = ""
 )

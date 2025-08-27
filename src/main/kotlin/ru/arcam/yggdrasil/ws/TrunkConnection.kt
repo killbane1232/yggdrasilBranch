@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.socket.WebSocketHttpHeaders
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
-import ru.arcam.yggdrasil.leaf.Leaf
 import ru.arcam.yggdrasil.leaf.LeafCollector
 import ru.arcam.yggdrasil.utils.NameResolver
 import java.lang.reflect.Type
@@ -63,7 +62,7 @@ class TrunkConnection {
             val payloadSplit = payload.toString().split(':')
             var args = listOf<String>()
             if (payloadSplit.size > 2)
-                args = payloadSplit.subList(2, payloadSplit.size - 1)
+                args = payloadSplit.subList(2, payloadSplit.size)
             val result = leafCollector.callServiceMethod(payloadSplit[1], payloadSplit[0], args)
             WSClient!!.send("/app/callback/$serviceName", result);
         }

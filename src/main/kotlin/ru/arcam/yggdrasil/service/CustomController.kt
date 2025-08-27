@@ -1,7 +1,5 @@
 package ru.arcam.yggdrasil.service
-import ru.arcam.yggdrasil.leaf.Leaf
-import ru.arcam.yggdrasil.leaf.LeafCollector
-import ru.arcam.yggdrasil.leaf.LeafController
+import ru.arcam.yggdrasil.leaf.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.lang.Exception
@@ -37,8 +35,10 @@ class CustomController(leaf: Leaf, val leafCollector: LeafCollector) : IControll
     }
 
     override fun callMethod(method: String, args: List<String>): String {
+        println("CALL ME LATER $method ${leaf.name} ${args.joinToString { it }}")
         try {
-            return LeafController.leafController.callLeafMethod(leaf.name, method, args)
+            val request = LeafMethodMessage(method, args)
+            return LeafHttpController.leafHttpController.callLeafMethod(leaf, request).body!!
         } catch (e: Exception) {
             e.printStackTrace()
         }
