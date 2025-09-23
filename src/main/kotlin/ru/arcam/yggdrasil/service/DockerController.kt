@@ -67,12 +67,14 @@ class DockerController(leaf: Leaf) : IController(leaf) {
                 num = tmp
         }
         val SERVER_LOGS = arrayOf("docker", "logs", leaf.name, "-n", num.toString())
+        println("Command: docker logs ${leaf.name} -n ${num.toString()}")
         try {
             val process = ProcessBuilder(*SERVER_LOGS).redirectErrorStream(true).start()
             process.waitFor()
             val input = process.inputStream
             val br = BufferedReader(InputStreamReader(input))
             val result = br.readLines().joinToString { it -> "\n" + it }
+            println("Command result: $result")
             return result
         } catch (e: Exception) {
             e.printStackTrace()
