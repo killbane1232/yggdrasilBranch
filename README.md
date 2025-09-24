@@ -69,5 +69,22 @@ services:
       BRANCHNAME: "{your branch name}"
     ports:
       - "8081:8080"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 ```
+
+Пример конфига WatchTower для автообновления 
+```
+version: "3"
+services:
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 900
+    environment:
+      WATCHTOWER_LABEL_ENABLE: true
+      WATCHTOWER_INCLUDE_RESTARTING: true
+```
+
 
