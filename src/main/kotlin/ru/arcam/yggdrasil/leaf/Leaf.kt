@@ -8,6 +8,7 @@ import kotlinx.serialization.Contextual
 import lombok.AllArgsConstructor
 import lombok.Builder
 import lombok.NoArgsConstructor
+import ru.arcam.yggdrasil.user.UserRight
 
 @Serializable
 @Builder
@@ -22,6 +23,8 @@ data class Leaf(
     var attachedBranch: String = "",
     @JsonProperty
     val hooks: List<LeafHook>,
+    @JsonProperty
+    val allowedUsers : Map<String, UserRight> = hashMapOf(),
     @JsonIgnore
     @Contextual
     var controller: IController? = null,

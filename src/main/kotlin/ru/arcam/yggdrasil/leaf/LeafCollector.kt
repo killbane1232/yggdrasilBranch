@@ -1,10 +1,12 @@
 package ru.arcam.yggdrasil.leaf
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import ru.arcam.yggdrasil.branch.BranchInfo
 import ru.arcam.yggdrasil.service.*
+import ru.arcam.yggdrasil.user.UserRight
 import ru.arcam.yggdrasil.utils.ConfigReader
 import ru.arcam.yggdrasil.utils.NameResolver
 import ru.arcam.yggdrasil.ws.TrunkConnection
@@ -53,7 +55,18 @@ class LeafCollector {
                     .filter { it.isNotBlank() && !it.startsWith("#") }
             }
             leafServices.forEach { x ->
-                val newLeaf = Leaf(x, "UNAVAIVABLE", serviceName, ArrayList(), null)
+                val strSplt = x.split(';')
+                val allowedUsers = HashMap<String, UserRight>()
+                if (strSplt.size > 1) {
+                    val userInfo = strSplt[1].split(',')
+                    for (it in userInfo) {
+                        val itemInfo = it.split(':')
+                        val userName = itemInfo[0]
+                        val rights = UserRight.getFromString(itemInfo[1])
+                        allowedUsers[userName] = rights
+                    }
+                }
+                val newLeaf = Leaf(strSplt[0], "UNAVAIVABLE", serviceName, ArrayList(), allowedUsers, null)
                 newLeaf.controller = if (isWindows) WindowsController(newLeaf) else LinuxController(newLeaf)
                 newLeaf.status = newLeaf.controller!!.status()
                 confServicesBuffer.add(newLeaf)
@@ -66,7 +79,18 @@ class LeafCollector {
                     .filter { it.isNotBlank() && !it.startsWith("#") }
             }
             leafServices.forEach { x ->
-                val newLeaf = Leaf(x, "UNAVAIVABLE", serviceName, ArrayList(), null)
+                val strSplt = x.split(';')
+                val allowedUsers = HashMap<String, UserRight>()
+                if (strSplt.size > 1) {
+                    val userInfo = strSplt[1].split(',')
+                    for (it in userInfo) {
+                        val itemInfo = it.split(':')
+                        val userName = itemInfo[0]
+                        val rights = UserRight.getFromString(itemInfo[1])
+                        allowedUsers[userName] = rights
+                    }
+                }
+                val newLeaf = Leaf(strSplt[0], "UNAVAIVABLE", serviceName, ArrayList(), allowedUsers, null)
                 newLeaf.controller = DockerController(newLeaf)
                 newLeaf.status = newLeaf.controller!!.status()
                 confServicesBuffer.add(newLeaf)
@@ -86,8 +110,21 @@ class LeafCollector {
         synchronized(lock) {
             confServices = ArrayList(configuredServices.union(linkedServices))
         }
+        var userConfigFile = ConfigReader.loadConfig("user.config")
+        var users: List<String> = listOf()
+        if (userConfigFile != null) {
+            users = userConfigFile.readLines()
+                .filter { it.isNotBlank() && !it.startsWith("#") }
+        }
+        val allowedUsers = HashMap<String, UserRight>()
+        users.forEach { x ->
+            val data = x.split(':')
+            if (data.size > 1) {
+                allowedUsers[data[0]] = UserRight.getFromString(data[1])
+            }
+        }
 
-        val currentInfo = BranchInfo(serviceName, confServices)
+        val currentInfo = BranchInfo(serviceName, confServices, allowedUsers)
 
         TrunkConnection.WSClient?.send("/app/assing", currentInfo)
     }
