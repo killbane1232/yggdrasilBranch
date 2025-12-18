@@ -3,17 +3,19 @@ package ru.arcam.yggdrasil.user
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 import lombok.Builder
+import lombok.NoArgsConstructor
 
 @Serializable
 @Builder
 data class UserRight(
     @JsonProperty
-    val read: Boolean,
+    var read: Boolean,
     @JsonProperty
-    val write: Boolean,
+    var write: Boolean,
     @JsonProperty
-    val execute: Boolean
+    var execute: Boolean
 ) {
+    constructor() : this(false, false, false)
     companion object {
         fun getFromString(right: String) : UserRight {
             return UserRight(
