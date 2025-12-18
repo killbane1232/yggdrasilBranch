@@ -13,15 +13,18 @@ data class UserRight(
     @JsonProperty
     var write: Boolean,
     @JsonProperty
-    var execute: Boolean
+    var execute: Boolean,
+    @JsonProperty
+    var admin: Boolean
 ) {
-    constructor() : this(false, false, false)
+    constructor() : this(false, false, false, false)
     companion object {
         fun getFromString(right: String) : UserRight {
             return UserRight(
                 right.contains('r', true),
                 right.contains('w', true),
-                right.contains('x', true)
+                right.contains('x', true),
+                right.contains('a', true)
             )
         }
     }

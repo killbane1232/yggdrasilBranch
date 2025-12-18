@@ -216,6 +216,7 @@ class LeafCollector {
                 if (rights.read) append('r')
                 if (rights.write) append('w')
                 if (rights.execute) append('x')
+                if (rights.admin) append('a')
             }
             "$userName:$rightsString"
         }
@@ -354,6 +355,7 @@ class LeafCollector {
                                 if (rights.read) append('r')
                                 if (rights.write) append('w')
                                 if (rights.execute) append('x')
+                                if (rights.admin) append('a')
                             }
                             "$userName:$rightsStr"
                         }.joinToString(",")
