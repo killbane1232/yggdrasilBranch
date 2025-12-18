@@ -1,0 +1,193 @@
+@startuml top to bottom direction
+!theme reddress-darkblue
+skinparam linetype ortholinear
+
+package "ru.arcam.yggdrasil.branch" {
+  class BranchInfo {
+    string serviceName
+    List<Leaf> leaves
+    Map<String, UserRight> allowedUsers
+  }
+  class BranchMessage {
+    String branchName
+    String leafName
+    Map<String, Any> messageData
+  }
+}
+package "ru.arcam.yggdrasil.leaf" {
+  class Leaf {
+    Stirng name
+    String status
+    String attachedBranch
+    List<LeafHook> hooks
+    Map<String, UserRight> allowedUsers
+    IController? controller
+    Int port
+    String url
+  }
+  class LeafCollector {
+    Boolean isWindows
+    Any lock
+    ArrayList<Leaf> linkedServices
+    ArrayList<Leaf> configuredServices
+    String serviceName
+    findConfigFile(filename: String): File?
+    updateConfiguredServices()
+    reportLeaves()
+    callServiceMethod(serviceName: String, method: String, args: List<String>) : String
+  }
+  class LeafController {
+    SimpMessagingTemplate messagingTemplate
+    LeafCollector leafCollector
+    RequestBuffer requestBuffer
+    handleLeafConnection(@Payload leaf: Leaf): Leaf
+    handleCallback(@DestinationVariable leaf: String, @DestinationVariable method: String, response: String)
+    callLeafMethod(@DestinationVariable leaf: String, method: String, args: List<String>): String
+    callBranchMethod(@DestinationVariable leaf: String, method: String, args: List<String>): String
+  }
+  class LeafHook {
+    String name
+    Map<String, HookType> hookFields
+  }
+  enum HookType {
+    STRING
+  }
+  class LeafHttpController {
+    SimpMessagingTemplate messagingTemplate
+    LeafCollector leafCollector
+    afterCreate()
+    handleLeafConnection(@RequestBody leaf: Leaf): ResponseEntity<String>
+    callLeafMethod(leaf: Leaf, request: LeafMethodMessage): ResponseEntity<String>
+    static leafHttpController: LeafHttpController
+  }
+  class LeafMethodMessage {
+      String method
+      List<String> args
+  }
+}
+package "ru.arcam.yggdrasil.service" {
+  class CustomController {
+    Leaf leaf
+    LeafCollector leafCollector
+  }
+  class DockerController {
+    Leaf leaf
+  }
+  class IController {
+    Leaf leaf
+    stop(): String
+    start(): String
+    restart(): String
+    status(): String
+    logs(args: List<String>? = null): String
+    callMethod(method: String, args: List<String>): String
+  }
+  class LinuxController {
+    Leaf leaf
+  }
+  class WindowsController {
+    Leaf leaf
+  }
+}
+package "ru.arcam.yggdrasil.user" {
+  class UserRight {
+    Boolean read
+    Boolean write
+    Boolean execute
+    getFromString(right: String) : UserRight
+  }
+}
+package ru.arcam.yggdrasil.utils {
+  class ConfigReader {
+    loadConfig(name: String): File?
+  }
+  class NameResolver {
+    String name
+  }
+}
+package ru.arcam.yggdrasil.ws {
+  class RequestBuffer {
+    ConcurrentHashMap<String, CompletableFuture<String>> requests
+    ConcurrentHashMap<String, LocalDateTime> requestTimestamps
+    Long timeoutMinutes
+    addRequest(leafName: String, methodName: String): CompletableFuture<String>
+    handleResponse(leafName: String, methodName: String, response: String)
+    cleanup()
+  }
+  class TrunkConfig {
+    String host
+    Int port
+    String path
+    Long timeout
+    loadConfig()
+    getWebSocketUrl()
+    getTimeout()
+  }
+  class TrunkConnection {
+    LeafCollector leafCollector
+    TrunkConfig config
+    restoreConnection()
+    static StompSession WSClient
+  }
+  class MyStompSessionHandler {
+    String serviceName
+    LeafCollector leafCollector
+    handleFrame(headers: StompHeaders, payload: Any?)
+    afterConnected(session: StompSession, connectedHeaders: StompHeaders)
+    handleTransportError(session: StompSession, exception: Throwable)
+    handleException(session: StompSession, command: StompCommand?, headers: StompHeaders, payload: ByteArray, exception: Throwable)
+  }
+  class WebSocketConfig {
+    configureMessageBroker(config: MessageBrokerRegistry)
+    registerStompEndpoints(registry: StompEndpointRegistry)
+    configureMessageConverters(messageConverters: MutableList<MessageConverter?>): Boolean
+    requestBuffer(): RequestBuffer
+  }
+  class WebSocketService {
+    SimpMessagingTemplate messagingTemplate
+    static WebSocketService wsService
+    afterCreate()
+    processMessage(@DestinationVariable username: String, @Payload data: String)
+  }
+}
+
+
+BranchInfo --> Leaf
+BranchInfo --> UserRight
+Leaf --> LeafHook
+Leaf --> UserRight
+Leaf -d-> IController
+LeafCollector --> Leaf
+LeafCollector -u-> ConfigReader
+LeafCollector -u-> NameResolver
+LeafCollector <-d-> TrunkConnection
+LeafCollector -> BranchInfo
+LeafCollector --> UserRight
+MyStompSessionHandler -u-> LeafCollector
+LeafController -r-> LeafCollector
+LeafController -d-> RequestBuffer
+LeafController -d-> Leaf
+LeafController -u-> NameResolver
+LeafController -u> LeafMethodMessage
+LeafController --> IController
+LeafHook -> HookType
+LeafHttpController -u-> LeafCollector
+LeafHttpController -> LeafMethodMessage
+LeafHttpController -u-> NameResolver
+LeafHttpController --> Leaf
+LeafHttpController -d-> CustomController
+CustomController -> Leaf
+CustomController -> LeafCollector
+CustomController .u.|> IController
+CustomController -> LeafMethodMessage
+DockerController .u.|> IController
+IController -u-> Leaf
+LinuxController -> Leaf
+LinuxController .u.|> IController
+WindowsController -> Leaf
+WindowsController .u.|> IController
+TrunkConfig -u-> ConfigReader
+TrunkConnection -u-> TrunkConfig
+TrunkConnection -u-> NameResolver
+WebSocketConfig -d-> RequestBuffer
+@enduml
