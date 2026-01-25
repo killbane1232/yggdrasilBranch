@@ -1,38 +1,51 @@
-Yggdrasil Branch - проект для быстрого подключения сервисов к сервису Yggdrasil
+# Yggdrasil Branch - Go версия
 
-Локальная сборка:
-```
-./gradlew bootJar
-mv ./build/libs/yggdrasilBranch-0.0.1-SNAPSHOT.jar {где удобнее будет, чтобы jar файл лежал}
+Go версия сервиса Yggdrasil Branch для быстрого подключения сервисов к сервису Yggdrasil.
+
+## Требования
+
+- Go 1.21 или выше
+- Доступ к systemctl (Linux) или sc (Windows) для управления сервисами
+- Docker (опционально, для управления контейнерами)
+
+## Сборка
+
+```bash
+cd go
+go build -o yggdrasil-branch
 ```
 
-Docker сборка
-```
-sudo docker build -t yggdrasil_branch:v2 .
+## Запуск
+
+```bash
+# На Linux (требуются права sudo для systemctl)
+sudo ./yggdrasil-branch --port=8081
+
+# На Windows (требуются права администратора)
+yggdrasil-branch.exe --port=8081
 ```
 
-Примеры обязательных файлов конфигурации
-websocket.config:
+## Конфигурация
+
+Сервис использует те же файлы конфигурации, что и Kotlin версия:
+
+### websocket.config
 ```
 # Конфигурация WebSocket подключения
-# Хост для подключения WebSocket
 websocket.host=localhost
-# Порт для подключения WebSocket
 websocket.port=8080
-# Путь для WebSocket endpoint
 websocket.path=/ws
-# Таймаут подключения в миллисекундах
 websocket.timeout=5000
 ```
 
-leaves.config:
+### leaves.config
 ```
-# Список имён windows сервисов или сервисов systemctl
+# Список имён systemd сервисов (Linux) или Windows сервисов
 minecraft
 albots
 ```
 
-docker.config:
+### docker.config
 ```
 # Список имён docker контейнеров
 gitea1
@@ -40,51 +53,83 @@ runner_1
 minecraft-server
 ```
 
-Запуск
+### user.config
 ```
-# sudo права не обязательны, если запуск идёт от пользователя, который без них может работать с systemctl
-# На Windows обязательны права админинстратора
-sudo java -jar ./yggdrasil.jar --server.port={порт, на котором будет работать YggdrasilBranch}
+# Глобальные права пользователей
+user1:rwxa
+user2:rwx
 ```
 
-Пример Docker Compose
+## API
+
+### HTTP API
+
+- `POST /api/leaf/connect` - Подключение листа
+- `POST /api/leaf/call/{leaf}` - Вызов метода листа
+- `POST /api/leaf/callback/{leaf}/{method}` - Callback от листа
+- `GET /api/leaf/status` - Статус всех листов
+- `GET /api/leaf/status/{leaf}` - Статус конкретного листа
+- `DELETE /api/leaf/disconnect/{leaf}` - Отключение листа
+
+### WebSocket
+
+- `ws://localhost:8081/ws` - WebSocket endpoint для подключения листов
+
+## Особенности
+
+1. **Кроссплатформенность**: Работает на Linux и Windows
+2. **Управление сервисами**: Поддержка systemd (Linux) и Windows Services
+3. **Docker поддержка**: Управление Docker контейнерами
+4. **WebSocket клиент**: Автоматическое подключение к Trunk
+5. **HTTP API**: RESTful API для управления листами
+
+## Отличия от Kotlin версии
+
+- Использует стандартную библиотеку Go вместо Spring Boot
+- Более легковесный и быстрый
+- Простая сборка в один бинарный файл
+- Нет зависимости от JVM
+
+## Docker сборка
+
+```bash
+cd go
+docker build -t yggdrasil-branch:latest .
 ```
+
+### Запуск Docker контейнера
+
+```bash
+docker run -d \
+  --name yggdrasil-branch \
+  -p 8081:8080 \
+  -v $(pwd)/config:/app/config \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e BRANCHNAME="your-branch-name" \
+  yggdrasil-branch:latest
+```
+
+**Важно:** Для работы DockerController необходим доступ к Docker socket (`/var/run/docker.sock`).
+
+### Docker Compose пример
+
+```yaml
 version: "3"
 
-networks:
-  yggdarsil:
-    external: false
-
 services:
-  server:
-    image: ghcr.io/killbane1232/yggdrasil_branch:latest
+  yggdrasil-branch:
+    build: ./go
     container_name: yggdrasilBranch
     restart: always
-    networks:
-      - yggdarsil
     volumes:
       - ./config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      BRANCHNAME: "{your branch name}"
+      BRANCHNAME: "your-branch-name"
     ports:
       - "8081:8080"
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
 ```
 
-Пример конфига WatchTower для автообновления 
-```
-version: "3"
-services:
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 900
-    environment:
-      WATCHTOWER_LABEL_ENABLE: true
-      WATCHTOWER_INCLUDE_RESTARTING: true
-```
+## Лицензия
 
-
+То же, что и основная версия проекта.

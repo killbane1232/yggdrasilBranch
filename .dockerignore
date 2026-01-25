@@ -1,0 +1,20 @@
+# Игнорируем бинарные файлы
+*.exe
+*.exe~
+yggdrasil-branch
+yggdrasil-branch.exe
+
+# Игнорируем конфигурационные файлы (будут монтироваться как volume)
+config/
+
+# Игнорируем git
+.git
+.gitignore
+
+# Игнорируем документацию
+*.md
+README.md
+
+# Игнорируем временные файлы
+*.tmp
+*.log
