@@ -26,7 +26,7 @@ func (dc *DockerController) GetLeaf() *models.Leaf {
 func (dc *DockerController) Stop() string {
 	cmd := exec.Command("docker", "stop", dc.leaf.Name)
 	if err := cmd.Run(); err != nil {
-		return "ERROR"
+		return "ERROR: " + err.Error()
 	}
 	return "OK"
 }
@@ -56,7 +56,7 @@ func (dc *DockerController) Status() string {
 	if err != nil {
 		return "UNAVAIVABLE"
 	}
-	
+
 	scanner := bufio.NewScanner(strings.NewReader(string(output)))
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -75,7 +75,7 @@ func (dc *DockerController) Logs(args []string) string {
 			num = n
 		}
 	}
-	
+
 	cmd := exec.Command("docker", "logs", dc.leaf.Name, "-n", intToString(num))
 	output, err := cmd.Output()
 	if err != nil {
